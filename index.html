@@ -87,7 +87,7 @@
     </div>
 </div>
 
-<input type="password" id="gemini-api-key" class="api-key-box" placeholder="🔒 Paste Google API Key Here" onchange="saveKey()">
+<input type="password" id="gemini-api-key" class="api-key-box" placeholder="🔒 Paste Google API Key / AQ Token Here" onchange="saveKey()">
 
 <button class="ai-scan" onclick="document.getElementById('camera-input').click()">📸 Scan Photo (Auto Extract AI)</button>
 <input type="file" id="camera-input" accept="image/*" capture="environment" style="display: none;" onchange="handleImageScan(event)">
@@ -225,7 +225,7 @@
     addCategoryWithRow();
 
     // ==========================================
-    // UPDATED BULLETPROOF AI SCANNER
+    // BULLETPROOF AI SCANNER (SUPPORTS BOTH AQ & AIza)
     // ==========================================
     async function handleImageScan(event) {
         const file = event.target.files[0];
@@ -233,7 +233,7 @@
         
         const apiKey = document.getElementById('gemini-api-key').value.trim();
         if (!apiKey) { 
-            alert("⚠️ Please paste your API Key first."); 
+            alert("⚠️ Please paste your API Key or AQ Token first."); 
             return; 
         }
 
@@ -257,10 +257,19 @@
             Format: [{"w": 450, "h": 2000, "qty": 1, "unit": "MM", "color": "MATT BLACK", "handle": "JMB-34 BINDI HANDLE", "size": "45MM"}]
             `;
 
-            // NEW FIX: Changed model to gemini-2.5-flash as 1.5 is shut down
-            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+            let fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+            let fetchHeaders = { 'Content-Type': 'application/json' };
+
+            // Automatically support AQ. bearer tokens vs standard AIza keys
+            if (apiKey.startsWith('AQ.')) {
+                fetchHeaders['Authorization'] = `Bearer ${apiKey}`;
+            } else {
+                fetchUrl += `?key=${apiKey}`;
+            }
+
+            const response = await fetch(fetchUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: fetchHeaders,
                 body: JSON.stringify({
                     contents: [{
                         parts: [
