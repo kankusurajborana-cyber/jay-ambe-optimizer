@@ -225,7 +225,7 @@
     addCategoryWithRow();
 
     // ==========================================
-    // BULLETPROOF AI SCANNER (SUPPORTS BOTH AQ & AIza)
+    // UPDATED AI SCANNER USING GEMINI-3.6-FLASH
     // ==========================================
     async function handleImageScan(event) {
         const file = event.target.files[0];
@@ -257,10 +257,10 @@
             Format: [{"w": 450, "h": 2000, "qty": 1, "unit": "MM", "color": "MATT BLACK", "handle": "JMB-34 BINDI HANDLE", "size": "45MM"}]
             `;
 
-            let fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent`;
+            // UPDATED MODEL ENDPOINT TO GEMINI-3.6-FLASH
+            let fetchUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent`;
             let fetchHeaders = { 'Content-Type': 'application/json' };
 
-            // Automatically support AQ. bearer tokens vs standard AIza keys
             if (apiKey.startsWith('AQ.')) {
                 fetchHeaders['Authorization'] = `Bearer ${apiKey}`;
             } else {
@@ -319,7 +319,7 @@
             console.error(err);
             loader.style.display = 'none';
         } finally {
-            event.target.value = ''; // Reset camera
+            event.target.value = '';
         }
     }
 
